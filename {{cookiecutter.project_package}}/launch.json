@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Plone",
+            "type": "python",
+            "request": "launch",
+            "module": "Zope2.Startup.serve",
+            "args": [
+                "-v",
+                "${workspaceFolder}/instance/etc/zope.ini"
+            ],
+        },
+        {
+            "name": "Python: Test Plone",
+            "type": "python",
+            "request": "launch",
+            "module": "zope.testrunner",
+            "args": [
+                "--test-path=src",
+            ],
+        }
+
+    ]
+}

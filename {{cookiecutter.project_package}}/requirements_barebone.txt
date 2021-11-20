@@ -1,0 +1,17 @@
+-c constraints.txt
+-e .[test]
+# WSGI
+Zope[wsgi]
+
+# DEV: Style/tests
+zope.testrunner
+black
+isort
+zpretty
+
+# this example shows how to install stuff from source
+# -e git+ssh://git@git.akbild.ac.at/akbild-webportal/software/akbild.api.git@main#egg=akbild.api
+
+# Bugs/tmp
+plone.app.iterate  ## see https://github.com/plone/Products.CMFPlone/issues/3352
+
