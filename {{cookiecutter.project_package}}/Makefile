@@ -34,7 +34,7 @@ help: ## This help message
 install: .installed.txt ## pip install all dependencies and scripts
 
 .installed.txt: requirements_barebone.txt constraints.txt sources.ini setup.cfg
-	@pip install -U "pip==${PIP_VERSION}" wheel
+	@pip install -U "pip==${PIP_VERSION}" wheel mxdev
 	@mxdev -c sources.ini
 	@pip install -r requirements-dev.txt ${PIP_PARAMS}
 	@pip freeze >.installed.txt
