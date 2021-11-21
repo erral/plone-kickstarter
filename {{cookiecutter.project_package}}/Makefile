@@ -33,9 +33,10 @@ help: ## This help message
 .PHONY: install
 install: .installed.txt ## pip install all dependencies and scripts
 
-.installed.txt: requirements_barebone.txt constraints.txt
+.installed.txt: requirements.txt constraints.txt sources.ini setup.cfg
 	@pip install -U "pip==${PIP_VERSION}" wheel
-	@pip install -r requirements_barebone.txt  ${PIP_PARAMS}
+	@mxdev -c sources.ini
+	@pip install -r requirements-dev.txt ${PIP_PARAMS}
 	@pip freeze >.installed.txt
 
 
@@ -57,7 +58,7 @@ run: instance  ## run Plone
 .PHONY: clean
 clean: install  ## remove instance configuration (keep data)
 	@rm -fr instance/etc instance/inituser
-	@pip uninstall -y -r requirements_barebone.txt
+	@pip uninstall -y -r requirements-dev.txt
 	@rm .installed.txt
 
 .PHONY: style
