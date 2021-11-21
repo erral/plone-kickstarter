@@ -13,6 +13,7 @@
                 "-v",
                 "${workspaceFolder}/instance/etc/zope.ini"
             ],
+            "justMyCode": false
         },
         {
             "name": "Python: Test Plone",
@@ -22,6 +23,7 @@
             "args": [
                 "--test-path=src",
             ],
+            "justMyCode": false
         }
 
     ]
