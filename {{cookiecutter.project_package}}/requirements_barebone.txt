@@ -9,9 +9,5 @@ black
 isort
 zpretty
 
-# this example shows how to install stuff from source
-# -e git+ssh://git@git.acme.com/foo.api.git@main#egg=foo.api
-
 # Bugs/tmp
 plone.app.iterate  ## see https://github.com/plone/Products.CMFPlone/issues/3352
-
