@@ -10,7 +10,7 @@ isort
 zpretty
 
 # this example shows how to install stuff from source
-# -e git+ssh://git@git.akbild.ac.at/akbild-webportal/software/akbild.api.git@main#egg=akbild.api
+# -e git+ssh://git@git.acme.com/foo.api.git@main#egg=foo.api
 
 # Bugs/tmp
 plone.app.iterate  ## see https://github.com/plone/Products.CMFPlone/issues/3352
