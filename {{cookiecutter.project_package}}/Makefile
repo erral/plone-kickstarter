@@ -18,7 +18,7 @@ YELLOW=`tput setaf 3`
 
 # Specifcs of this Makefile
 PIP_VERSION=21.3
-PIP_PARAMS=--src devsrc --use-deprecated legacy-resolver
+PIP_PARAMS=--use-deprecated legacy-resolver
 
 # install and run
 .PHONY: all
