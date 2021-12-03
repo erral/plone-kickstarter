@@ -75,7 +75,7 @@ instance.yaml:
 instance: ${INSTANCE_TARGET} ## create configuration for an zope (plone) instance
 
 ${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} .has_cookiecutter
-	@cookiecutter -f --no-input --config-file instance.yaml devsrc/cookiecutter-zope-instance
+	@cookiecutter -f --no-input --config-file instance.yaml https://github.com/bluedynamics/cookiecutter-zope-instance
 
 .PHONY: test
 test: ${TEST_PREREQUISITES}  ## run tests
