@@ -65,8 +65,11 @@ ${INSTALL_TARGET}: ${PREPARE_TARGET}
 	@pip freeze >${INSTALL_TARGET}
 
 .has_cookiecutter:
-	@pip install -e git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
+	@pip install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
 	@touch .has_cookiecutter
+
+instance.yaml:
+	@touch instance.yaml
 
 .PHONY: instance
 instance: ${INSTANCE_TARGET} ## create configuration for an zope (plone) instance
