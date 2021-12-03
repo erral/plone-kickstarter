@@ -64,9 +64,9 @@ ${INSTALL_TARGET}: ${PREPARE_TARGET}
 	# @tail -2 skel/settings.json >>.vscode/settings.json
 	@pip freeze >${INSTALL_TARGET}
 
-.has_cookiecutter:
+.cookiecutter.sentinel:
 	@pip install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
-	@touch .has_cookiecutter
+	@touch .cookiecutter.sentinel
 
 instance.yaml:
 	@touch instance.yaml
@@ -74,7 +74,7 @@ instance.yaml:
 .PHONY: instance
 instance: ${INSTANCE_TARGET} ## create configuration for an zope (plone) instance
 
-${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} .has_cookiecutter
+${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} .cookiecutter.sentinel
 	@cookiecutter -f --no-input --config-file instance.yaml https://github.com/bluedynamics/cookiecutter-zope-instance
 
 .PHONY: test
