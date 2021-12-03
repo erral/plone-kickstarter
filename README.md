@@ -1,4 +1,4 @@
-# kickstarting plone with make & pip
+# Kickstarting Plone with make & pip
 
 This cookiecutter template helps in
 
@@ -16,7 +16,6 @@ This cookiecutter template helps in
 - (optional) `plonecli` and `bobtemplates.plone` (>= 6.0b10)
 
   Best is to install the two tools into your standard Python 3 (not the venv inside the project).
-
 
 ## Usage
 
@@ -51,7 +50,7 @@ Create a Python 3 *virtualenv* and activate it.
 Use the Makefile
 
 ```bash
-    $ make run
+    make run
 ```
 
 This installs, builds the instance and run Plone.
@@ -92,5 +91,5 @@ Have fun!
 
 ## Contributors
 
-- Philipp Auersperg
-- Jens Klein
+- Philipp Auersperg @zworkb
+- Jens Klein @jensens

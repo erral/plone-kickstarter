@@ -1,0 +1,11 @@
+---
+default_context:
+    http_address: {{ cookiecutter.host }}
+    http_port: {{ cookiecutter.port }}
+    initial_user_name: 'admin'
+    initial_user_password: 'admin'
+
+    load_zcml:
+        package_includes: ['{{ cookiecutter.project_package }}']
+
+    db_storage: direct

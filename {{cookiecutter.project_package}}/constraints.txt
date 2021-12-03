@@ -1,1 +1,1 @@
--c https://dist.plone.org/release/6.0.0a1/constraints.txt
+-c https://dist.plone.org/release/{{ cookiecutter.plone_version }}/constraints.txt

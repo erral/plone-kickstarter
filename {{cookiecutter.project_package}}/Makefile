@@ -17,12 +17,29 @@ YELLOW=`tput setaf 3`
 
 
 # Specifcs of this Makefile
-PIP_VERSION=21.3
-PIP_PARAMS=--use-deprecated legacy-resolver
+PACKAGENAME={{ cookiecutter.project_package }}
+INSTANCE_FOLDER=instance
+
+PIP_VERSION=21.3.1
+PIP_PARAMS= --pre --use-deprecated legacy-resolver
+
+# targets and prerequisites
+# target has to be one file, otherwise step gets executes for each file separate
+PREPARE_PREREQUISITES=requirements.txt constraints.txt setup.cfg sources.ini
+PREPARE_TARGET=requirements-dev.txt
+INSTALL_PREREQUSISTES=${PREPARE_TARGET}
+INSTALL_TARGET=.installed.txt
+INSTANCE_PREREQUISITES=${INSTALL_TARGET} instance.yaml
+INSTANCE_TARGET=${INSTANCE_FOLDER}/etc/zope.ini ${INSTANCE_FOLDER}/etc/zope.conf ${INSTANCE_FOLDER}/etc/site.zcml
+TEST_PREREQUISITES=${INSTALL_TARGET}
+RUN_PREREQUISITES=${INSTANCE_TARGET}
+
+# for clean, what to remove
+CLEAN_FILES=${INSTALL_PREREQUSISTES} .installed.txt .has_cookiecutter ${INSTANCE_TARGET}
 
 # install and run
 .PHONY: all
-all: install instance run
+all: prepare install instance test run
 
 # Add the following 'help' target to your Makefile
 # And add help text after each target name starting with '\#\#'
@@ -30,39 +47,47 @@ all: install instance run
 help: ## This help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: install
-install: .installed.txt ## pip install all dependencies and scripts
+.PHONY: prepare
+prepare: ${PREPARE_TARGET} ## prepare soures and dependencies
 
-.installed.txt: requirements_barebone.txt constraints.txt sources.ini setup.cfg
+${PREPARE_TARGET}: ${PREPARE_PREREQUISITES}
 	@pip install -U "pip==${PIP_VERSION}" wheel mxdev
 	@mxdev -c sources.ini
-	@pip install -r requirements-dev.txt ${PIP_PARAMS}
-	@pip freeze >.installed.txt
 
+.PHONY: install
+install: ${INSTALL_TARGET} ## pip install all dependencies and scripts
+
+${INSTALL_TARGET}: ${PREPARE_TARGET}
+	@pip install -r ${PREPARE_TARGET} ${PIP_PARAMS}
+	# @head -2 skel/settings.json >.vscode/settings.json
+	# @python -c "import sys; [print(f'        \"{p}\",') for p in sys.path if p]" >>.vscode/settings.json
+	# @tail -2 skel/settings.json >>.vscode/settings.json
+	@pip freeze >${INSTALL_TARGET}
+
+.has_cookiecutter:
+	@pip install -e git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
+	@touch .has_cookiecutter
 
 .PHONY: instance
-instance: instance/etc/zope.ini  ## create configuration for an zope (plone) instance
+instance: ${INSTANCE_TARGET} ## create configuration for an zope (plone) instance
 
-instance/etc/zope.ini: install
-	@mkwsgiinstance -d instance -u admin:admin
-	@cp skel/zope.ini instance/etc/
-	@mkdir -p instance/etc/package-includes
-	@cp skel/project-configure.zcml instance/etc/package-includes/{{cookiecutter.project_package}}-configure.zcml
+${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} .has_cookiecutter
+	@cookiecutter -f --no-input --config-file instance.yaml devsrc/cookiecutter-zope-instance
 
-test: install
+.PHONY: test
+test: ${TEST_PREREQUISITES}  ## run tests
 	@zope-testrunner --test-path=src
 
-run: instance  ## run Plone
+.PHONY: run
+run: ${RUN_PREREQUISITES} ## run Plone
 	@runwsgi -v instance/etc/zope.ini
 
 .PHONY: clean
-clean: install  ## remove instance configuration (keep data)
-	@rm -fr instance/etc instance/inituser
-	@pip uninstall -y -r requirements-dev.txt
-	@rm .installed.txt
+clean:  ## remove instance configuration (keep data)
+	@rm ${CLEAN_FILES}
 
 .PHONY: style
-style: install  ## format code (black, isort, zpretty)
+style:  ## format code (black, isort, zpretty)
 	@isort src
 	@black src
 	@find src -name "*.zcml"|xargs zpretty -iz
