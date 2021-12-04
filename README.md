@@ -18,7 +18,7 @@ This cookiecutter template helps in
   pip install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
   ```
 
-- (optional, for mode *addon*) `plonecli` and `bobtemplates.plone` (>= 6.0b10) if you want to crate a plone customization or addon.
+- (optional, for mode *addon*) `plonecli` (and `bobtemplates.plone` (>= 6.0b10) if you want to crate a plone customization or addon.
 
   Best is to install the two tools into your standard Python 3 (not the venv inside the project).
 
@@ -43,6 +43,28 @@ The setup can then be enhanced for your needs.
 - Run ``make run``
 
 ### Create a Plone addon
+
+#### TL/DR:
+
+```bash
+pip install plonecli "bobtemplates.plone>=6.0b10" git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
+plonecli create addon acme.foo
+# (set Plone verson to 6.0.0a2, otherwise answer questions with defaults)
+cookiecutter -f --checkout update-makefile https://github.com/bluedynamics/plone-kickstarter.git
+# (select addon mode, otherwse defaults)
+cd acme.foo
+python3.9 -m venv venv
+. venv/activate
+make run
+```
+
+#### Detailed
+
+Install *plonecli*
+
+```bash
+pip install plonecli "bobtemplates.plone>=6.0b10"
+```
 
 First create your Plone project, let's call it "acme.foo" using *plonecli* and *bobtemplates.plone*:
 
