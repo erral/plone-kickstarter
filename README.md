@@ -1,80 +1,132 @@
-# kickstarting plone with make & pip
+# Kickstarting Plone 6
 
-This cookiecutter template helps in
+Bakes a configuration to start Plone 6 using *make*, *mxdev*, *pip*, *cookiecutter* and *WSGI*.
 
-- building and running Plone using pip and a Makefile
+This cookiecutter templates result helps in
+
+- building Plone or an add-on for Plone using pip, mxdev and a Makefile
+- running Plone (with add-on)
+- developing an addon with above tools
 - launching and debugging Plone from within VisualCode
 
 ## Prerequisites
 
-- cookiecutter
+- `cookiecutter` (temporary the current unreleased version from github, due to unreleased bugfixes we depend on).
 
-    $ pip3 install cookiecutter
+  ```bash
+  pip install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
+  ```
 
-- (optional) plonecli and bobtemplates.plone (>= 6.0b10)
+- (optional, for mode *addon*) `plonecli` (and `bobtemplates.plone` (>= 6.0b10) if you want to crate a plone customization or addon.
 
-Best is to install the two tools into your standard python3 (not the venv inside the project)
+  Best is to install the two tools into your standard Python 3 (not the venv inside the project).
 
 ## Usage
 
-### create the project
+```bash
+    cookiecutter -f https://github.com/bluedynamics/plone-kickstarter
+```
 
-first create your Plone project, lets call it "acme.foo" using plonecli and bobtemplates.plone
+It supports two mode: ``standalone`` and ``addon``.
 
-    $ plonecli create addon acme.foo
+**standalone** creates a setup for a minimal vanilla Plone site.
+The setup can then be enhanced for your needs.
 
-answer all questions and use Plone 6.0.0a1 
+**addon** is meant to add a the setup to a prior created plonecli code.
+
+### Create a vanilla Plone site
+
+- Run cookiecutter with option `mode` set to ``standalone``.
+- Enter generated direcory.
+- Create a Pythn 3.9 virtualenv and activate it.
+- Run ``make run``
+
+### Create a Plone addon
+
+#### TL/DR
+
+```bash
+pip install plonecli "bobtemplates.plone>=6.0b10" git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
+plonecli create addon acme.foo
+# (set Plone verson to 6.0.0a2, otherwise answer questions with defaults)
+cookiecutter -f https://github.com/bluedynamics/plone-kickstarter.git
+# (select addon mode, otherwse defaults)
+cd acme.foo
+python3.9 -m venv venv
+. venv/activate
+make run
+```
+
+#### Detailed
+
+Install *plonecli*
+
+```bash
+pip install plonecli "bobtemplates.plone>=6.0b10"
+```
+
+First create your Plone project, let's call it "acme.foo" using *plonecli* and *bobtemplates.plone*:
+
+```bash
+    plonecli create addon acme.foo
+```
+
+Answer all questions and use Plone latest Plone 6 (6.0.0a2 at the time of writing).
 
 Then add the magic to the newly created project by applying this cookiecutter template:
 
-    $ cookiecutter -f https://github.com/bluedynamics/plone-kickstarter
+```bash
+    cookiecutter -f https://github.com/bluedynamics/plone-kickstarter
+```
 
 You have to answer the project package with the same name as the addon name, so `acme.foo` in this case.
 
-### build and run
+Run cookiecutter with option `mode` set to ``addon``.
+
+For details on the usage of the Makefile read the generated file `README_USAGE.md`.
 
 Enter the created project
 
-    $ cd acme.foo
+```bash
+    cd acme.foo
+```
 
-create a virtual env and activate it
+Create a Python 3 *virtualenv* and activate it.
 
-Use the Makefile 
+Use the Makefile
 
-    $ make run
+```bash
+    make run
+```
 
-This should install, build instance and run
+For details on the usage of the Makefile read the generated file `README_USAGE.md`.
 
-The Makefile has the targets
-
-- install
-- instance
-- run
-- test
-- style (applies black and isort)
-
-## VisualCode support
+## Visual Studio Code support
 
 ### Prerequisite
 
-install the official Microsoft Python plugin
+Install the official Microsoft Python plugin.
 
-### Usage
+### Usage in VSCode
 
-- start vscode with
+- Start VSCode in your projetc folder with
 
-    $ code .
+  ```bash
+  code .
+  ```
 
-- select the python environment that you have used to build the project
+- Select the python environment that you have used to build the project (your virtalenv).
 
-- When you click on the debug icon you can see two run configurations in the dropdown box at the top:
+- When you click on the debug icon you can see up to two run configurations in the dropdown box at the top:
 
-    - Python: Plone
-    - Python: Test Plone
+  - `Python: Plone ($PROJECTNAME)`
+  - `Python: Test Plone  ($PROJECTNAME)` (only in mode addon)
 
-With those you can run and test Plone, you can set breakpoints have access to the interactive debugger of VisualCode, have fun
+With those you can run and test Plone, you can set breakpoints have access to the interactive debugger of VisualCode.
+
+Have fun!
 
 ## Contributors
 
-- Jens Klein
-- Philipp Auersperg
+- Philipp Auersperg @zworkb
+- Jens Klein @jensens

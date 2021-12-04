@@ -1,8 +1,0 @@
-<configure
-    xmlns="http://namespaces.zope.org/zope"
-    xmlns:meta="http://namespaces.zope.org/meta"
-    xmlns:five="http://namespaces.zope.org/five">
-
-  <include package="{{cookiecutter.project_package}}" />
-
-</configure>

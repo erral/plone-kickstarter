@@ -1,0 +1,17 @@
+-c constraints.txt
+{%- if cookiecutter.mode == "addon" %}
+-e .[test]
+{%- else %}
+Plone
+{%- endif %}
+
+# WSGI
+Zope[wsgi]
+
+{%- if cookiecutter.mode == "addon" %}
+# DEV: Style/tests
+zope.testrunner
+black
+isort
+zpretty
+{%- endif %}
