@@ -49,7 +49,7 @@ The setup can then be enhanced for your needs.
 pip install plonecli "bobtemplates.plone>=6.0b10" git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
 plonecli create addon acme.foo
 # (set Plone verson to 6.0.0a2, otherwise answer questions with defaults)
-cookiecutter -f --checkout update-makefile https://github.com/bluedynamics/plone-kickstarter.git
+cookiecutter -f https://github.com/bluedynamics/plone-kickstarter.git
 # (select addon mode, otherwse defaults)
 cd acme.foo
 python3.9 -m venv venv
