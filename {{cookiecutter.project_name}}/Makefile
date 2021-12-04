@@ -58,7 +58,7 @@ help: ## This help message
 	@pip install -c constraints.txt pip wheel
 	@touch .make-pip.sentinel
 
-.make-mxdev.sentinel:
+.make-mxdev.sentinel: .make-pip.sentinel
 	@echo "$(OK_COLOR)Install mxdev$(NO_COLOR)"
 	@pip install -c constraints.txt mxdev
 	@touch .make-mxdev.sentinel
@@ -81,10 +81,10 @@ ${INSTALL_TARGET}: ${PREPARE_TARGET}
 	# @tail -2 skel/settings.json >>.vscode/settings.json
 	@pip freeze >${INSTALL_TARGET}
 
-.cookiecutter.sentinel:
+.make-cookiecutter.sentinel:
 	@echo "$(OK_COLOR)Install cookiecutter$(NO_COLOR)"
 	@pip install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
-	@touch .cookiecutter.sentinel
+	@touch .make-cookiecutter.sentinel
 
 instance.yaml:
 	@touch instance.yaml
@@ -92,7 +92,7 @@ instance.yaml:
 .PHONY: instance
 instance: ${INSTANCE_TARGET} ## create configuration for an zope (plone) instance
 
-${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} .cookiecutter.sentinel
+${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} .make-cookiecutter.sentinel
 	@echo "$(OK_COLOR)Create Plone/Zope configuration$(NO_COLOR)"
 	@cookiecutter -f --no-input --config-file instance.yaml https://github.com/bluedynamics/cookiecutter-zope-instance
 
