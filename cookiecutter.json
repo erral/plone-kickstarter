@@ -1,6 +1,8 @@
 {
     "project_name": "acme.foo",
     "addon": ["on", "off"],
-    "listen": "localhost:8080",
-    "plone_version": "6.0.0a2"
+    "admin_user": "admin",
+    "admin_password": "",
+    "plone_version": "6.0.0a2",
+    "listen": "localhost:8080"
 }
