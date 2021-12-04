@@ -12,7 +12,7 @@ default_context:
     wsgi_http_listen: {{ cookiecutter.listen }}
     initial_user_name: {{ cookiecutter.admin_user }}
     initial_user_password: {{ cookiecutter.admin_password }}
-{%- if cookiecutter.addon == "on" %}
+{%- if cookiecutter.mode == "addon" %}
     load_zcml:
         package_includes: ['{{ cookiecutter.project_name }}']
 {%- endif %}

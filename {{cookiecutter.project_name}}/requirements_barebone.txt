@@ -1,5 +1,5 @@
 -c constraints.txt
-{%- if cookiecutter.addon == "on" %}
+{%- if cookiecutter.mode == "addon" %}
 -e .[test]
 {%- else %}
 Plone
@@ -8,7 +8,7 @@ Plone
 # WSGI
 Zope[wsgi]
 
-{%- if cookiecutter.addon == "on" %}
+{%- if cookiecutter.mode == "addon" %}
 # DEV: Style/tests
 zope.testrunner
 black

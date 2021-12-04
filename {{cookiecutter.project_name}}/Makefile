@@ -19,7 +19,7 @@ NO_COLOR=`tput sgr0`
 
 # Specifcs of this Makefile
 INSTANCE_FOLDER=instance
-{%- if cookiecutter.addon == "on" %}
+{%- if cookiecutter.mode == "addon" %}
 PIP_REQUIREMENTS_IN_FILE=requirements_barebone.txt
 {%- else %}
 PIP_REQUIREMENTS_IN_FILE=requirements.txt
@@ -29,13 +29,13 @@ PIP_PARAMS= --pre --use-deprecated legacy-resolver
 
 # targets and prerequisites
 # target has to be one file, otherwise step gets executes for each file separate
-PREPARE_PREREQUISITES=.make-pip.sentinel .make-mxdev.sentinel ${PIP_REQUIREMENTS_IN_FILE} constraints.txt sources.ini{%- if cookiecutter.addon == "on" %} setup.cfg{%- endif %}
+PREPARE_PREREQUISITES=.make-pip.sentinel .make-mxdev.sentinel ${PIP_REQUIREMENTS_IN_FILE} constraints.txt sources.ini{%- if cookiecutter.mode == "addon" %} setup.cfg{%- endif %}
 PREPARE_TARGET=requirements-dev.txt
 INSTALL_PREREQUSISTES=${PREPARE_TARGET}
 INSTALL_TARGET=.installed.txt
 INSTANCE_PREREQUISITES=${INSTALL_TARGET} instance.yaml
 INSTANCE_TARGET=${INSTANCE_FOLDER}/etc/zope.ini ${INSTANCE_FOLDER}/etc/zope.conf ${INSTANCE_FOLDER}/etc/site.zcml
-{%- if cookiecutter.addon == "on" %}
+{%- if cookiecutter.mode == "addon" %}
 TEST_PREREQUISITES=${INSTALL_TARGET}
 {%- endif %}
 RUN_PREREQUISITES=${INSTANCE_TARGET}
@@ -45,7 +45,7 @@ CLEAN_FILES=${INSTALL_PREREQUSISTES} .installed.txt .make-*.sentinel ${INSTANCE_
 
 # install and run
 .PHONY: all
-all: {%- if cookiecutter.addon == "on" %}test {%- endif %}run
+all: {%- if cookiecutter.mode == "addon" %}test {%- endif %}run
 
 # Add the following 'help' target to your Makefile
 # And add help text after each target name starting with '\#\#'
@@ -96,7 +96,7 @@ ${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} .make-cookiecutter.sentinel
 	@echo "$(OK_COLOR)Create Plone/Zope configuration$(NO_COLOR)"
 	@cookiecutter -f --no-input --config-file instance.yaml https://github.com/bluedynamics/cookiecutter-zope-instance
 
-{%- if cookiecutter.addon == "on" %}
+{%- if cookiecutter.mode == "addon" %}
 .PHONY: test
 test: ${TEST_PREREQUISITES}  ## run tests
 	@echo "$(OK_COLOR)Run addon tests$(NO_COLOR)"
@@ -113,7 +113,7 @@ clean:  ## remove instance configuration (keeps data)
 	@echo "$(OK_COLOR)Remove Plone/Zope configuration (keeps data) and sentinel files.$(NO_COLOR)"
 	rm ${CLEAN_FILES}
 
-{%- if cookiecutter.addon == "on" %}
+{%- if cookiecutter.mode == "addon" %}
 .PHONY: style
 style:  ## format code (black, isort, zpretty)
 	@echo "$(OK_COLOR)Apply style guide rules to code in ./src/*$(NO_COLOR)"

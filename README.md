@@ -3,6 +3,7 @@
 This cookiecutter template helps in
 
 - building and running Plone using pip, mxdev and a Makefile
+- developing an addon with above tools
 - launching and debugging Plone from within VisualCode
 
 ## Prerequisites
@@ -13,10 +14,9 @@ This cookiecutter template helps in
   pip install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
   ```
 
-- (optional) `plonecli` and `bobtemplates.plone` (>= 6.0b10) if you want to crate a plone customization or addon.
+- (optional, fo addons) `plonecli` and `bobtemplates.plone` (>= 6.0b10) if you want to crate a plone customization or addon.
 
   Best is to install the two tools into your standard Python 3 (not the venv inside the project).
-
 
 ## Usage
 

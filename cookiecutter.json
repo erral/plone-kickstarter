@@ -1,6 +1,6 @@
 {
     "project_name": "acme.foo",
-    "addon": ["on", "off"],
+    "mode": ["standalone", "addon"],
     "admin_user": "admin",
     "admin_password": "",
     "plone_version": "6.0.0a2",
