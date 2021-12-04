@@ -1,9 +1,8 @@
-# Kickstarting Plone with MMPCR
+# Kickstarting Plone 6
 
-MMPCR stand for the *M*ake, *M*xdev, *P*ip, *C*ookiecutter, *R*unswsgi process.
-Let's bake a MMCP setup for Plone.
+Bakes a configuration to start Plone 6 using *make*, *mxdev*, *pip*, *cookiecutter* and *WSGI*.
 
-This cookiecutter template helps in
+This cookiecutter templates result helps in
 
 - building Plone or an add-on for Plone using pip, mxdev and a Makefile
 - running Plone (with add-on)
@@ -44,7 +43,7 @@ The setup can then be enhanced for your needs.
 
 ### Create a Plone addon
 
-#### TL/DR:
+#### TL/DR
 
 ```bash
 pip install plonecli "bobtemplates.plone>=6.0b10" git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
