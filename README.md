@@ -1,8 +1,8 @@
-# Kickstarting Plone with make & pip
+# Kickstarting Plone with make, mxdev & pip
 
 This cookiecutter template helps in
 
-- building and running Plone using pip and a Makefile
+- building and running Plone using pip, mxdev and a Makefile
 - launching and debugging Plone from within VisualCode
 
 ## Prerequisites
@@ -10,16 +10,28 @@ This cookiecutter template helps in
 - `cookiecutter` (temporary the current unreleased version from github, due to unreleased bugfixes).
 
   ```bash
-  pip3 install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
+  pip install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
   ```
 
-- (optional) `plonecli` and `bobtemplates.plone` (>= 6.0b10)
+- (optional) `plonecli` and `bobtemplates.plone` (>= 6.0b10) if you want to crate a plone customization or addon.
 
   Best is to install the two tools into your standard Python 3 (not the venv inside the project).
 
+
 ## Usage
 
-### create the project
+```bash
+    cookiecutter -f https://github.com/bluedynamics/plone-kickstarter
+```
+### Create a vanilla Plone site
+
+- Run cookiecutter.
+- Set option ``addon`` to ``off``.
+- Enter generated direcory.
+- Create a virtualenv and activate it.
+- Run ``make run``
+-
+### Create a Plone addon
 
 First create your Plone project, let's call it "acme.foo" using *plonecli* and *bobtemplates.plone*:
 
@@ -36,6 +48,7 @@ Then add the magic to the newly created project by applying this cookiecutter te
 ```
 
 You have to answer the project package with the same name as the addon name, so `acme.foo` in this case.
+If left empty a
 
 ### build and run
 
