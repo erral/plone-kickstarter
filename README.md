@@ -21,6 +21,54 @@ This cookiecutter templates result helps in
 
   Best is to install the two tools into your standard Python 3 (not the venv inside the project).
 
+## Options
+
+`project_name`
+    Name of the project or addon.
+    In mode *standalone* just the target folder name;
+    in mode *addon* the dotted name of the package.
+
+`mode`
+    - `standalone` (default): generate a build system for a Plone site,
+      but folder does not direcly contain a source package (like generated with *plonecli*).
+    - `addon`: generate a integrated build for an addon.
+
+`requirements-out`
+    *mexdev* is used to help with development with sources on top f stable constraints.
+    It generates a pip requirements file.
+    Configure here how the file is named.
+    Default: `requirements-mxdev.txt`.
+`admin_user`
+    *cookiecutter-zope-instance* is used to generate an instance configuration for the Plone/Zope application server.
+    It creates an initial user with full access.
+    This is the username.
+    Default: `admin`.
+`admin_user`
+    *cookiecutter-zope-instance* is used to generate an instance configuration for the Plone/Zope application server.
+    It creates an initial user with full access.
+    This is the password.
+    If empty a password is generated.
+    Default: empty.
+`plone_version`
+    Plone Release to be used in the constraints file.
+    Default: Should be most recent version, except short after a new release (PR's welcome).
+`listen`
+    *host:port* for the WSGI server to listen on.
+    Usually "localhost:8080" for local development or "0.0.0.0:8080" if the port needs to be accessible from the outside.
+    Default: `localhost:8080`
+
+These options can be stored in a `plone-kickstarter.yaml`:
+
+```YML
+    default_context:
+        project_name: 'admin'
+        mode: 'addon'
+        admin_user: 'admin
+```
+
+Pass additional parameters `--no-input --config-file plone-kickstarter.yaml`.
+*cookicutter* takes the stored values or the defaults and does not ask further questions.
+
 ## Usage
 
 ```bash
