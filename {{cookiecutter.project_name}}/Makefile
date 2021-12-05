@@ -14,14 +14,17 @@ MAKEFLAGS+=--warn-undefined-variables
 MAKEFLAGS+=--no-builtin-rules
 
 # Colors
+# OK=Green, warn=yellow, error=red
 OK_COLOR=`tput setaf 2`
-# WARN_YELLOW=`tput setaf 3`
-# ERROR_COLOR=`tput setaf 1`
+# WARN_COLOR=`tput setaf 3`
+ERROR_COLOR=`tput setaf 1`
 NO_COLOR=`tput sgr0`
 
 ##############################################################################
 # SETTINGS AND VARIABLE
 # adjust to your project needs
+PROJEKT_NAME={{ cookiecutter.project_name }}
+IMAGE_NAME=${PROJEKT_NAME}
 CONSTRAINTS=constraints.txt
 {%- if cookiecutter.mode == "addon" %}
 PIP_REQUIREMENTS_IN_FILE=requirements_barebone.txt
@@ -175,7 +178,7 @@ apply-style-isort: ${ISORT_SENTINEL} ## apply/format code style isort (sorted im
 .PHONY: apply-style-zpretty
 apply-style-zpretty: ${ZPRETTY_SENTINEL}   ## apply/format code style zpretty (to XML/ZCML files)
 	@echo "$(OK_COLOR)Apply style zpretty rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-	@find ${ADDONFOLDER} -name "*.zcml"|xargs zpretty -iz
+	@find ${ADDONFOLDER} -name '*.zcml' -exec zpretty --check -z {} +
 	@find ${ADDONFOLDER} -name "*.xml"|grep -v locales|xargs zpretty -ix
 
 .PHONY: style ## apply code styles black, isort and zpretty
@@ -197,8 +200,8 @@ lint-isort: ${ISORT_SENTINEL} ## lint code-style isort (sorted imports in Python
 .PHONY: lint-zpretty
 lint-zpretty: ${ZPRETTY_SENTINEL}   ## lint code-style zpretty (to XML/ZCML files)
 	@echo "$(OK_COLOR)Apply style zpretty rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-	@find ${ADDONFOLDER} -name "*.zcml"|xargs zpretty --check -z
-	@find ${ADDONFOLDER} -name "*.xml"|grep -v locales|xargs zpretty --check -x
+	@find ${ADDONFOLDER} -name '*.zcml' -exec zpretty --check -z {} +
+	@find ${ADDONFOLDER} -name '*.xml'|grep -v locales|xargs zpretty --check -x
 
 .PHONY: lint ## lint all: check if complies with code-styles black, isort and zpretty
 liny: lint-black lint-isort lint-zpretty
@@ -234,3 +237,15 @@ clean-instance:  ## remove instance configuration (keeps data)
 
 .PHONY: clean
 clean:  clean-pyc clean-make clean-instance  ## clean all (except local database and pip installed packages)
+
+##############################################################################
+# DOCKER/CONTAINER
+
+# this needs a Dockerfile, which is not provided by plone-kickstarter
+.PHONY: build-image
+build-image:  ## Build Docker Image
+ifneq ("$(wildcard Dockerfile)", "")
+	@docker build . -t $(IMAGE_NAME) -f Dockerfile
+else
+	@echo "$(ERROR_COLOR)A 'Dockerfile' is required to build an image.$(NO_COLOR)"
+endif
