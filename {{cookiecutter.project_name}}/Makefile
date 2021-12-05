@@ -16,7 +16,7 @@ MAKEFLAGS+=--no-builtin-rules
 # Colors
 # OK=Green, warn=yellow, error=red
 OK_COLOR=`tput setaf 2`
-# WARN_COLOR=`tput setaf 3`
+WARN_COLOR=`tput setaf 3`
 ERROR_COLOR=`tput setaf 1`
 NO_COLOR=`tput sgr0`
 
@@ -72,19 +72,39 @@ ${SENTINEL}:
 	@mkdir -p ${SENTINELFOLDER}
 	@echo "Sentinels for the Makefile process." > ${SENTINEL}
 
+# PYTHON, VENV, PIP
+# installed?
+PYTHON=python3
+ifeq (, $(shell which python ))
+  $(error "PYTHON=$(PYTHON) not found in $(PATH)")
+endif
+
+# version ok?
+PYTHON_VERSION_MIN=3.7
+PYTHON_VERSION_OK=$(shell $(PYTHON) -c 'import sys; print(int(float("%d.%d"% sys.version_info[0:2]) >= float($(PYTHON_VERSION_MIN))))' )
+ifeq ($(PYTHON_VERSION_OK),0)
+  $(error "Need python $(PYTHON_VERSION) >= $(PYTHON_VERSION_MIN)")
+endif
+
+PYBIN=./venv/bin/
+VENV=${PYBIN}python
+${VENV}:
+	@echo "$(OK_COLOR)Setup Python Virtual Environment under './venv' $(NO_COLOR)"
+	@${PYTHON} -m venv venv
+
 PIP_SENTINEL=${SENTINELFOLDER}pip.sentinel
-${PIP_SENTINEL}: ${CONSTRAINTS} ${SENTINEL}
+${PIP_SENTINEL}: ${VENV} ${CONSTRAINTS} ${SENTINEL}
 	@echo "$(OK_COLOR)Install pip according to ${CONSTRAINTS}$(NO_COLOR)"
-	@pip install -c ${CONSTRAINTS} pip wheel
+	@${PYBIN}pip install -c ${CONSTRAINTS} pip wheel
 	@touch ${PIP_SENTINEL}
 
 ##############################################################################
 # MXDEV
 
-MXDEV_SENTINEL=${SENTINELFOLDER}mxdev.sentinel
+MXDEV_SENTINEL=${SENTINELFOLDER}pip-mxdev.sentinel
 ${MXDEV_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install mxdev$(NO_COLOR)"
-	@pip install mxdev
+	@${PYBIN}pip install mxdev
 	@touch ${MXDEV_SENTINEL}
 
 .PHONY: prepare
@@ -95,23 +115,23 @@ ${PREPARE_PREREQUISITES}:
 
 ${PREPARE_TARGET}: ${MXDEV_SENTINEL} ${PREPARE_PREREQUISITES}
 	@echo "$(OK_COLOR)Prepare sources and dependencies$(NO_COLOR)"
-	@mxdev -c sources.ini
+	@${PYBIN}mxdev -c sources.ini
 
 .PHONY: install
 install: ${INSTALL_TARGET} ## pip install all dependencies and scripts
 
 ${INSTALL_TARGET}: ${PREPARE_TARGET}
 	@echo "$(OK_COLOR)Install dependencies and scripts$(NO_COLOR)"
-	@pip install -r ${PREPARE_TARGET} ${PIP_PARAMS}
-	@pip freeze >${INSTALL_TARGET}
+	@${PYBIN}pip install -r ${PREPARE_TARGET} ${PIP_PARAMS}
+	@${PYBIN}pip freeze >${INSTALL_TARGET}
 
 ##############################################################################
 # INSTANCE
 
-COOKIECUTTER_SENTINEL=${SENTINELFOLDER}cookiecutter.sentinel
+COOKIECUTTER_SENTINEL=${SENTINELFOLDER}pip-cookiecutter.sentinel
 ${COOKIECUTTER_SENTINEL}:
 	@echo "$(OK_COLOR)Install cookiecutter$(NO_COLOR)"
-	@pip install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
+	@${PYBIN}pip install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
 	@touch ${COOKIECUTTER_SENTINEL}
 
 instance.yaml:
@@ -122,22 +142,22 @@ instance: ${INSTANCE_TARGET} ## create configuration for an zope (plone) instanc
 
 ${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} ${COOKIECUTTER_SENTINEL}
 	@echo "$(OK_COLOR)Create Plone/Zope configuration$(NO_COLOR)"
-	@cookiecutter -f --no-input --config-file instance.yaml https://github.com/bluedynamics/cookiecutter-zope-instance
+	@${PYBIN}cookiecutter -f --no-input --config-file instance.yaml https://github.com/bluedynamics/cookiecutter-zope-instance
 
 {%- if cookiecutter.mode == "addon" %}
 ##############################################################################
 # TESTING
 
-TESTRUNNER_SENTINEL=${SENTINELFOLDER}testrunner.sentinel
+TESTRUNNER_SENTINEL=${SENTINELFOLDER}pip-testrunner.sentinel
 ${TESTRUNNER_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install zope.testrunner$(NO_COLOR)"
-	@pip install zope.testrunner
+	@${PYBIN}pip install zope.testrunner
 	@touch ${TESTRUNNER_SENTINEL}
 
 .PHONY: test
 test: ${TEST_PREREQUISITES} ${TESTRUNNER_SENTINEL} ## run tests
 	@echo "$(OK_COLOR)Run addon tests$(NO_COLOR)"
-	@zope-testrunner --auto-color --auto-progress --test-path=${ADDONFOLDER}
+	@${PYBIN}zope-testrunner --auto-color --auto-progress --test-path=${ADDONFOLDER}
 
 .PHONY: test-ignore-warnings
 test-ignore-warnings: ${TEST_PREREQUISITES} ${TESTRUNNER_SENTINEL}  ## run tests (hide warnins)
@@ -147,64 +167,65 @@ test-ignore-warnings: ${TEST_PREREQUISITES} ${TESTRUNNER_SENTINEL}  ## run tests
 ##############################################################################
 # CODE FORMATTING
 
-BLACK_SENTINEL=${SENTINELFOLDER}black.sentinel
+BLACK_SENTINEL=${SENTINELFOLDER}pip-black.sentinel
 ${BLACK_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install black$(NO_COLOR)"
-	@pip install black
+	@${PYBIN}pip install black
 	@touch ${BLACK_SENTINEL}
 
-ISORT_SENTINEL=${SENTINELFOLDER}isort.sentinel
+ISORT_SENTINEL=${SENTINELFOLDER}pip-isort.sentinel
 ${ISORT_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install isort$(NO_COLOR)"
-	@pip install isort
+	@${PYBIN}pip install isort
 	@touch ${ISORT_SENTINEL}
 
-ZPRETTY_SENTINEL=${SENTINELFOLDER}zpretty.sentinel
+ZPRETTY_SENTINEL=${SENTINELFOLDER}pip-zpretty.sentinel
 ${ZPRETTY_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install zpretty$(NO_COLOR)"
-	@pip install zpretty
+	@${PYBIN}pip install zpretty
 	@touch ${ZPRETTY_SENTINEL}
 
 .PHONY: apply-style-black
 apply-style-black: ${BLACK_SENTINEL}  ## apply/format code style black (to Python files)
 	@echo "$(OK_COLOR)Apply style black rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-	@black ${ADDONFOLDER}
+	@${PYBIN}black ${ADDONFOLDER}
 
 .PHONY: apply-style-isort
 apply-style-isort: ${ISORT_SENTINEL} ## apply/format code style isort (sorted imports in Python files)
 	@echo "$(OK_COLOR)Apply style isort rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-	@isort ${ADDONFOLDER}
+	@${PYBIN}isort ${ADDONFOLDER}
 
 .PHONY: apply-style-zpretty
 apply-style-zpretty: ${ZPRETTY_SENTINEL}   ## apply/format code style zpretty (to XML/ZCML files)
 	@echo "$(OK_COLOR)Apply style zpretty rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-	@find ${ADDONFOLDER} -name '*.zcml' -exec zpretty --check -z {} +
-	@find ${ADDONFOLDER} -name "*.xml"|grep -v locales|xargs zpretty -ix
+	@find ${ADDONFOLDER} -name '*.zcml' -exec ${PYBIN}zpretty --check -z {} +
+	@find ${ADDONFOLDER} -name "*.xml"|grep -v locales|xargs ${PYBIN}zpretty -ix
 
 .PHONY: style ## apply code styles black, isort and zpretty
 style: apply-style-black apply-style-isort apply-style-zpretty
 
 .PHONY: format ## alias for "style"
-style: style
+FORMATTING: style
 
 .PHONY: lint-black
 lint-black: ${BLACK_SENTINEL}  ## lint code-style black (to Python files)
 	@echo "$(OK_COLOR)Lint black rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-	@black --check ${ADDONFOLDER}
+	@${PYBIN}black --check ${ADDONFOLDER}
 
 .PHONY: lint-isort
 lint-isort: ${ISORT_SENTINEL} ## lint code-style isort (sorted imports in Python files)
 	@echo "$(OK_COLOR)Apply style isort rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-	@isort --check-only ${ADDONFOLDER}
+	@${PYBIN}isort --check-only ${ADDONFOLDER}
 
-.PHONY: lint-zpretty
-lint-zpretty: ${ZPRETTY_SENTINEL}   ## lint code-style zpretty (to XML/ZCML files)
-	@echo "$(OK_COLOR)Apply style zpretty rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-	@find ${ADDONFOLDER} -name '*.zcml' -exec zpretty --check -z {} +
-	@find ${ADDONFOLDER} -name '*.xml'|grep -v locales|xargs zpretty --check -x
+# waiting for a release
+# .PHONY: lint-zpretty
+# lint-zpretty: ${ZPRETTY_SENTINEL}   ## lint code-style zpretty (to XML/ZCML files)
+# 	@echo "$(OK_COLOR)Apply style zpretty rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
+# 	@find ${ADDONFOLDER} -name '*.zcml' -exec ${PYBIN}zpretty --check -z {} +
+# 	@find ${ADDONFOLDER} -name '*.xml'|grep -v locales|xargs zpretty --check -x
 
 .PHONY: lint ## lint all: check if complies with code-styles black, isort and zpretty
-liny: lint-black lint-isort lint-zpretty
+lint: lint-black lint-isort
 {%- endif %}
 
 ##############################################################################
@@ -213,10 +234,13 @@ liny: lint-black lint-isort lint-zpretty
 .PHONY: run
 run: ${RUN_PREREQUISITES} ## run/start Plone
 	@echo "$(OK_COLOR)Run Plone$(NO_COLOR)"
-	@runwsgi -v instance/etc/zope.ini
+	@${PYBIN}runwsgi -v instance/etc/zope.ini
 
 ##############################################################################
 # CLEAN
+.PHONY: clean-venv
+clean-venv: ## remove Python virtual environment
+	rm -rf ./venv ${SENTINELFOLDER}/pip*.sentinel
 
 .PHONY: clean-pyc
 clean-pyc: ## remove Python file artifacts
@@ -236,7 +260,7 @@ clean-instance:  ## remove instance configuration (keeps data)
 	rm -f ${INSTANCE_TARGET}
 
 .PHONY: clean
-clean:  clean-pyc clean-make clean-instance  ## clean all (except local database and pip installed packages)
+clean:  clean-venv clean-pyc clean-make clean-instance   ## clean all (except local database and pip installed packages)
 
 ##############################################################################
 # DOCKER/CONTAINER
