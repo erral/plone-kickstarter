@@ -1,5 +1,8 @@
 # Makefile to configure and run Plone instance
 
+##############################################################################
+# SETUP MAKE
+
 ## Defensive settings for make: https://tech.davis-hansson.com/p/make/
 SHELL:=bash
 .ONESHELL:
@@ -17,7 +20,8 @@ OK_COLOR=`tput setaf 2`
 NO_COLOR=`tput sgr0`
 
 ##############################################################################
-# Specifcs of this Makefile
+# SETTINGS AND VARIABLE
+# adjust to your project needs
 CONSTRAINTS=constraints.txt
 {%- if cookiecutter.mode == "addon" %}
 PIP_REQUIREMENTS_IN_FILE=requirements_barebone.txt
@@ -28,8 +32,8 @@ PIP_REQUIREMENTS_IN_FILE=requirements.txt
 INSTANCE_FOLDER=instance
 
 PIP_PARAMS= --pre --use-deprecated legacy-resolver
-##############################################################################
 
+##############################################################################
 # targets and prerequisites
 # target has to be one file, otherwise step gets executes for each file separate
 PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS} sources.ini{%- if cookiecutter.mode == "addon" %} setup.cfg{%- endif %}
@@ -43,16 +47,21 @@ TEST_PREREQUISITES=${INSTALL_TARGET}
 {%- endif %}
 RUN_PREREQUISITES=${INSTANCE_TARGET}
 
+##############################################################################
+# CONVINIENCE
 
 # install and run
-.PHONY: all
-all: {%- if cookiecutter.mode == "addon" %}test {%- endif %}run
+.PHONY: all # full install, test and run
+all: {%- if cookiecutter.mode == "addon" %}style test {%- endif %}run
 
 # Add the following 'help' target to your Makefile
 # And add help text after each target name starting with '\#\#'
 .PHONY: help
 help: ## This help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+##############################################################################
+# BASE
 
 SENTINELFOLDER=.make-sentinels/
 SENTINEL=${SENTINELFOLDER}ABOUT.txt
@@ -65,6 +74,9 @@ ${PIP_SENTINEL}: ${CONSTRAINTS} ${SENTINEL}
 	@echo "$(OK_COLOR)Install pip according to ${CONSTRAINTS}$(NO_COLOR)"
 	@pip install -c ${CONSTRAINTS} pip wheel
 	@touch ${PIP_SENTINEL}
+
+##############################################################################
+# MXDEV
 
 MXDEV_SENTINEL=${SENTINELFOLDER}mxdev.sentinel
 ${MXDEV_SENTINEL}: ${PIP_SENTINEL}
@@ -90,6 +102,9 @@ ${INSTALL_TARGET}: ${PREPARE_TARGET}
 	@pip install -r ${PREPARE_TARGET} ${PIP_PARAMS}
 	@pip freeze >${INSTALL_TARGET}
 
+##############################################################################
+# INSTANCE
+
 COOKIECUTTER_SENTINEL=${SENTINELFOLDER}cookiecutter.sentinel
 ${COOKIECUTTER_SENTINEL}:
 	@echo "$(OK_COLOR)Install cookiecutter$(NO_COLOR)"
@@ -107,6 +122,8 @@ ${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} ${COOKIECUTTER_SENTINEL}
 	@cookiecutter -f --no-input --config-file instance.yaml https://github.com/bluedynamics/cookiecutter-zope-instance
 
 {%- if cookiecutter.mode == "addon" %}
+##############################################################################
+# TESTING
 
 TESTRUNNER_SENTINEL=${SENTINELFOLDER}testrunner.sentinel
 ${TESTRUNNER_SENTINEL}: ${PIP_SENTINEL}
@@ -123,6 +140,9 @@ test: ${TEST_PREREQUISITES} ${TESTRUNNER_SENTINEL} ## run tests
 test-ignore-warnings: ${TEST_PREREQUISITES} ${TESTRUNNER_SENTINEL}  ## run tests (hide warnins)
 	@echo "$(OK_COLOR)Run addon tests$(NO_COLOR)"
 	@PYTHONWARNINGS=ignore zope-testrunner --auto-color --auto-progress --test-path=${ADDONFOLDER}
+
+##############################################################################
+# CODE FORMATTING
 
 BLACK_SENTINEL=${SENTINELFOLDER}black.sentinel
 ${BLACK_SENTINEL}: ${PIP_SENTINEL}
@@ -184,10 +204,16 @@ lint-zpretty: ${ZPRETTY_SENTINEL}   ## lint code-style zpretty (to XML/ZCML file
 liny: lint-black lint-isort lint-zpretty
 {%- endif %}
 
+##############################################################################
+# RUN
+
 .PHONY: run
 run: ${RUN_PREREQUISITES} ## run/start Plone
 	@echo "$(OK_COLOR)Run Plone$(NO_COLOR)"
 	@runwsgi -v instance/etc/zope.ini
+
+##############################################################################
+# CLEAN
 
 .PHONY: clean-pyc
 clean-pyc: ## remove Python file artifacts
