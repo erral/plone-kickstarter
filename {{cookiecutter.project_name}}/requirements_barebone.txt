@@ -6,12 +6,4 @@ Plone
 {%- endif %}
 
 # WSGI
-Zope[wsgi]
-
-{%- if cookiecutter.mode == "addon" %}
-# DEV: Style/tests
-zope.testrunner
-black
-isort
-zpretty
-{%- endif %}
+Paste
