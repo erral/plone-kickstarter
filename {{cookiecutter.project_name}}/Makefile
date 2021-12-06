@@ -78,19 +78,6 @@ TEST_PREREQUISITES=${INSTALL_TARGET}
 RUN_PREREQUISITES=${INSTANCE_TARGET}
 
 ##############################################################################
-# CONVINIENCE
-
-# install and run
-.PHONY: all # full install, test and run
-all:style testrun
-
-# Add the following 'help' target to your Makefile
-# And add help text after each target name starting with '\#\#'
-.PHONY: help
-help: ## This help message
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
-
-##############################################################################
 # BASE
 
 SENTINELFOLDER=.make-sentinels/
