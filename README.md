@@ -84,9 +84,9 @@ The setup can then be enhanced for your needs.
 
 ### Create a vanilla Plone site
 
+- Ensure Python 3.9 is installed (including pip).
 - Run cookiecutter with option `mode` set to ``standalone``.
 - Enter generated direcory.
-- Create a Pythn 3.9 virtualenv and activate it.
 - Run ``make run``
 
 ### Create a Plone addon
@@ -100,8 +100,6 @@ plonecli create addon acme.foo
 cookiecutter -f https://github.com/bluedynamics/plone-kickstarter.git
 # (select addon mode, otherwse defaults)
 cd acme.foo
-python3.9 -m venv venv
-. venv/activate
 make run
 ```
 
@@ -138,8 +136,6 @@ Enter the created project
 ```bash
     cd acme.foo
 ```
-
-Create a Python 3 *virtualenv* and activate it.
 
 Use the Makefile
 

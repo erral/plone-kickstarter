@@ -23,15 +23,17 @@ NO_COLOR=`tput sgr0`
 ##############################################################################
 # SETTINGS AND VARIABLE
 # adjust to your project needs
-PROJEKT_NAME={{ cookiecutter.project_name }}
-IMAGE_NAME=${PROJEKT_NAME}
+PROJECT_NAME={{ cookiecutter.project_name }}
+IMAGE_NAME=${PROJECT_NAME}
 CONSTRAINTS=constraints.txt
 {%- if cookiecutter.mode == "addon" %}
 PIP_REQUIREMENTS_IN_FILE=requirements_barebone.txt
-ADDONFOLDER=./src
+ADDONBASE=./
+ADDONFOLDER=${ADDONBASE}src/
 {%- else %}
 PIP_REQUIREMENTS_IN_FILE=requirements.txt
 {%- endif %}
+INSTANCE_YAML=instance.yaml
 INSTANCE_FOLDER=instance
 
 PIP_PARAMS= --pre --use-deprecated legacy-resolver
@@ -39,11 +41,11 @@ PIP_PARAMS= --pre --use-deprecated legacy-resolver
 ##############################################################################
 # targets and prerequisites
 # target has to be one file, otherwise step gets executes for each file separate
-PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS} sources.ini{%- if cookiecutter.mode == "addon" %} setup.cfg{%- endif %}
+PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS} sources.ini{%- if cookiecutter.mode == "addon" %} ${ADDONBASE}setup.cfg{%- endif %}
 PREPARE_TARGET={{ cookiecutter.requirements_out }}
 INSTALL_PREREQUSISTES=${PREPARE_TARGET}
 INSTALL_TARGET=.installed.txt
-INSTANCE_PREREQUISITES=${INSTALL_TARGET} instance.yaml
+INSTANCE_PREREQUISITES=${INSTALL_TARGET} ${INSTANCE_YAML}
 INSTANCE_TARGET=${INSTANCE_FOLDER}/etc/zope.ini ${INSTANCE_FOLDER}/etc/zope.conf ${INSTANCE_FOLDER}/etc/site.zcml
 {%- if cookiecutter.mode == "addon" %}
 TEST_PREREQUISITES=${INSTALL_TARGET}
@@ -64,6 +66,31 @@ help: ## This help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 ##############################################################################
+# targets and prerequisites
+# target has to be one file, otherwise step gets executes for each file separate
+PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS} sources.ini ${ADDONBASE}setup.cfg
+PREPARE_TARGET=requirements-mxdev.txt
+INSTALL_PREREQUSISTES=${PREPARE_TARGET}
+INSTALL_TARGET=.installed.txt
+INSTANCE_PREREQUISITES=${INSTALL_TARGET} ${INSTANCE_YAML}
+INSTANCE_TARGET=${INSTANCE_FOLDER}/etc/zope.ini ${INSTANCE_FOLDER}/etc/zope.conf ${INSTANCE_FOLDER}/etc/site.zcml
+TEST_PREREQUISITES=${INSTALL_TARGET}
+RUN_PREREQUISITES=${INSTANCE_TARGET}
+
+##############################################################################
+# CONVINIENCE
+
+# install and run
+.PHONY: all # full install, test and run
+all:style testrun
+
+# Add the following 'help' target to your Makefile
+# And add help text after each target name starting with '\#\#'
+.PHONY: help
+help: ## This help message
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+##############################################################################
 # BASE
 
 SENTINELFOLDER=.make-sentinels/
@@ -73,9 +100,24 @@ ${SENTINEL}:
 	@echo "Sentinels for the Makefile process." > ${SENTINEL}
 
 # PYTHON, VENV, PIP
-# installed?
+# venv and pybin
 PYTHON=python3
-ifeq (, $(shell which python ))
+VENV?=on
+ifeq ("${VENV}", "on")
+	VENV_FOLDER?=./venv
+	PYBIN=${VENV_FOLDER}/bin/
+else
+	VENV_FOLDER?=
+	ifneq ("${VENV_FOLDER}", "")
+		PYBIN=${VENV_FOLDER}/bin/
+		PYTHON=${PYBIN}python
+	else
+		PYBIN=
+	endif
+endif
+
+# installed?
+ifeq (, $(shell which $(PYTHON) ))
   $(error "PYTHON=$(PYTHON) not found in $(PATH)")
 endif
 
@@ -86,14 +128,18 @@ ifeq ($(PYTHON_VERSION_OK),0)
   $(error "Need python $(PYTHON_VERSION) >= $(PYTHON_VERSION_MIN)")
 endif
 
-PYBIN=./venv/bin/
-VENV=${PYBIN}python
-${VENV}:
-	@echo "$(OK_COLOR)Setup Python Virtual Environment under './venv' $(NO_COLOR)"
-	@${PYTHON} -m venv venv
+VENV_SENTINEL=${SENTINELFOLDER}venv.sentinel
+${VENV_SENTINEL}: ${SENTINEL}
+ifeq ("${VENV}", "on")
+	@echo "$(OK_COLOR)Setup Python Virtual Environment under '${VENV_FOLDER}' $(NO_COLOR)"
+	@${PYTHON} -m venv ${VENV_FOLDER}
+else
+	@echo "$(OK_COLOR)Use current local or global Python: `which ${PYTHON}` $(NO_COLOR)"
+endif
+	@touch ${VENV_SENTINEL}
 
 PIP_SENTINEL=${SENTINELFOLDER}pip.sentinel
-${PIP_SENTINEL}: ${VENV} ${CONSTRAINTS} ${SENTINEL}
+${PIP_SENTINEL}: ${VENV_SENTINEL} ${CONSTRAINTS} ${SENTINEL}
 	@echo "$(OK_COLOR)Install pip according to ${CONSTRAINTS}$(NO_COLOR)"
 	@${PYBIN}pip install -c ${CONSTRAINTS} pip wheel
 	@touch ${PIP_SENTINEL}
@@ -134,15 +180,15 @@ ${COOKIECUTTER_SENTINEL}:
 	@${PYBIN}pip install git+https://github.com/cookiecutter/cookiecutter.git#egg=cookiecutter
 	@touch ${COOKIECUTTER_SENTINEL}
 
-instance.yaml:
-	@touch instance.yaml
+${INSTANCE_YAML}:
+	@touch ${INSTANCE_YAML}
 
 .PHONY: instance
 instance: ${INSTANCE_TARGET} ## create configuration for an zope (plone) instance
 
 ${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} ${COOKIECUTTER_SENTINEL}
 	@echo "$(OK_COLOR)Create Plone/Zope configuration$(NO_COLOR)"
-	@${PYBIN}cookiecutter -f --no-input --config-file instance.yaml https://github.com/bluedynamics/cookiecutter-zope-instance
+	@${PYBIN}cookiecutter -f --no-input --config-file ${INSTANCE_YAML} https://github.com/bluedynamics/cookiecutter-zope-instance
 
 {%- if cookiecutter.mode == "addon" %}
 ##############################################################################
@@ -240,7 +286,12 @@ run: ${RUN_PREREQUISITES} ## run/start Plone
 # CLEAN
 .PHONY: clean-venv
 clean-venv: ## remove Python virtual environment
-	rm -rf ./venv ${SENTINELFOLDER}/pip*.sentinel
+ifeq ("${VENV}", "on")
+	@echo "$(OK_COLOR)Remove Virtualenv.$(NO_COLOR)"
+	rm -rf ${VENV_FOLDER} ${SENTINELFOLDER}/pip*.sentinel ${VENV_SENTINEL}
+else:
+	@echo "$(OK_WARN)No self-created Python virtualenv at '${VENV_FOLDER}'! Nothing to do.$(NO_COLOR)"
+endif
 
 .PHONY: clean-pyc
 clean-pyc: ## remove Python file artifacts
