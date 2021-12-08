@@ -195,7 +195,7 @@ test: ${TEST_PREREQUISITES} ${TESTRUNNER_SENTINEL} ## run tests
 .PHONY: test-ignore-warnings
 test-ignore-warnings: ${TEST_PREREQUISITES} ${TESTRUNNER_SENTINEL}  ## run tests (hide warnins)
 	@echo "$(OK_COLOR)Run addon tests$(NO_COLOR)"
-	@PYTHONWARNINGS=ignore zope-testrunner --auto-color --auto-progress --test-path=${ADDONFOLDER}
+	@PYTHONWARNINGS=ignore ${PYBIN}zope-testrunner --auto-color --auto-progress --test-path=${ADDONFOLDER}
 
 ##############################################################################
 # CODE FORMATTING
@@ -283,8 +283,8 @@ endif
 .PHONY: clean-pyc
 clean-pyc: ## remove Python file artifacts
 	@echo "$(OK_COLOR)Remove Python file artifacts (like byte-code) of code in current directory.$(NO_COLOR)"
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*.py[c|o]' -delete
+	find . -name '*.mo' -delete
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 
