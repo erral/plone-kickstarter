@@ -25,7 +25,9 @@ NO_COLOR=`tput sgr0`
 # adjust to your project needs
 PROJECT_NAME={{ cookiecutter.project_name }}
 IMAGE_NAME=${PROJECT_NAME}
-CONSTRAINTS=constraints.txt
+CONSTRAINTS_IN=constraints.txt
+CONSTRAINTS_IN=constraints.txt
+CONSTRAINTS_MXDEV=constraints-mxdev.txt
 {%- if cookiecutter.mode == "addon" %}
 PIP_REQUIREMENTS_IN_FILE=requirements_barebone.txt
 ADDONBASE=./
@@ -41,7 +43,7 @@ PIP_PARAMS= --pre --use-deprecated legacy-resolver
 ##############################################################################
 # targets and prerequisites
 # target has to be one file, otherwise step gets executes for each file separate
-PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS} sources.ini{%- if cookiecutter.mode == "addon" %} ${ADDONBASE}setup.cfg{%- endif %}
+PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS_IN} sources.ini{%- if cookiecutter.mode == "addon" %} ${ADDONBASE}setup.cfg{%- endif %}
 PREPARE_TARGET={{ cookiecutter.requirements_out }}
 INSTALL_PREREQUSISTES=${PREPARE_TARGET}
 INSTALL_TARGET=.installed.txt
@@ -68,7 +70,7 @@ help: ## This help message
 ##############################################################################
 # targets and prerequisites
 # target has to be one file, otherwise step gets executes for each file separate
-PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS} sources.ini ${ADDONBASE}setup.cfg
+PREPARE_PREREQUISITES=${PIP_REQUIREMENTS_IN_FILE} ${CONSTRAINTS_IN} sources.ini ${ADDONBASE}setup.cfg
 PREPARE_TARGET=requirements-mxdev.txt
 INSTALL_PREREQUSISTES=${PREPARE_TARGET}
 INSTALL_TARGET=.installed.txt
@@ -126,9 +128,9 @@ endif
 	@touch ${VENV_SENTINEL}
 
 PIP_SENTINEL=${SENTINELFOLDER}pip.sentinel
-${PIP_SENTINEL}: ${VENV_SENTINEL} ${CONSTRAINTS} ${SENTINEL}
-	@echo "$(OK_COLOR)Install pip according to ${CONSTRAINTS}$(NO_COLOR)"
-	@${PYBIN}pip install -c ${CONSTRAINTS} pip wheel
+${PIP_SENTINEL}: ${VENV_SENTINEL} ${CONSTRAINTS_IN} ${SENTINEL}
+	@echo "$(OK_COLOR)Install pip according to ${CONSTRAINTS_IN}$(NO_COLOR)"
+	@${PYBIN}pip install -c ${CONSTRAINTS_IN} pip wheel
 	@touch ${PIP_SENTINEL}
 
 ##############################################################################
@@ -184,7 +186,7 @@ ${INSTANCE_TARGET}: ${INSTANCE_PREREQUISITES} ${COOKIECUTTER_SENTINEL}
 TESTRUNNER_SENTINEL=${SENTINELFOLDER}pip-testrunner.sentinel
 ${TESTRUNNER_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install zope.testrunner$(NO_COLOR)"
-	@${PYBIN}pip install zope.testrunner
+	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} zope.testrunner
 	@touch ${TESTRUNNER_SENTINEL}
 
 .PHONY: test
@@ -203,19 +205,19 @@ test-ignore-warnings: ${TEST_PREREQUISITES} ${TESTRUNNER_SENTINEL}  ## run tests
 BLACK_SENTINEL=${SENTINELFOLDER}pip-black.sentinel
 ${BLACK_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install black$(NO_COLOR)"
-	@${PYBIN}pip install black
+	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} black
 	@touch ${BLACK_SENTINEL}
 
 ISORT_SENTINEL=${SENTINELFOLDER}pip-isort.sentinel
 ${ISORT_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install isort$(NO_COLOR)"
-	@${PYBIN}pip install isort
+	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} isort
 	@touch ${ISORT_SENTINEL}
 
 ZPRETTY_SENTINEL=${SENTINELFOLDER}pip-zpretty.sentinel
 ${ZPRETTY_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install zpretty$(NO_COLOR)"
-	@${PYBIN}pip install zpretty
+	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} zpretty
 	@touch ${ZPRETTY_SENTINEL}
 
 .PHONY: apply-style-black
