@@ -1,6 +1,6 @@
 # Information about the Makefile
 
-How to use the pip, mxdev, cookiecutter-zope-instance and make based install.
+How to use this pip, mxdev, cookiecutter-zope-instance and make based install.
 
 ## Usage
 
@@ -17,17 +17,20 @@ All options are printed with
 make help
 ```
 
+Here some of the important ones:
+
 ```text
-clean       remove instance configuration (keeps data)
-help        This help message
-install     pip install all dependencies and scripts
-instance    create configuration for an zope (plone) instance
-prepare     prepare soures and dependencies
 run         run Plone
 {%- if cookiecutter.mode == "adon" %}
-style       format code (black, isort, zpretty)
 test        run tests
+lint        lint all: check if complies with code-styles black, isort and zpretty
+style       format code (black, isort, zpretty)
 {%- endif %}
+prepare     prepare soures and dependencies
+install     pip install all dependencies and scripts
+instance    create configuration for an zope (plone) instance
+clean       remove instance configuration (keeps data)
+...
 ```
 
 Order for ``make run`` is: *prepare*, *install*, *instance*, *run*.
@@ -60,7 +63,7 @@ They aim to ease development and deployment of *Plone 6+*
 
 `constraints.txt`
     Version pins for your project, used by *pip*.
-`INSTALL.md`
+`README_MAKE.md`
     (this file)
 `instance.yaml`
     Zope/Plone application server configuration. Used by *cookiecutter-zope-instance*

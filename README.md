@@ -1,4 +1,4 @@
-# Kickstarting Plone 6
+# Kickstarting Plone 6 (backend)
 
 Bakes a configuration to start Plone 6 using *make*, *mxdev*, *pip*, *cookiecutter* and *WSGI*.
 

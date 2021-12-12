@@ -217,7 +217,7 @@ ${ISORT_SENTINEL}: ${PIP_SENTINEL}
 ZPRETTY_SENTINEL=${SENTINELFOLDER}pip-zpretty.sentinel
 ${ZPRETTY_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install zpretty$(NO_COLOR)"
-	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} zpretty
+	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} zpretty>=2.2.0
 	@touch ${ZPRETTY_SENTINEL}
 
 .PHONY: apply-style-black
@@ -252,15 +252,14 @@ lint-isort: ${ISORT_SENTINEL} ## lint code-style isort (sorted imports in Python
 	@echo "$(OK_COLOR)Apply style isort rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
 	@${PYBIN}isort --check-only ${ADDONFOLDER}
 
-# waiting for a release
-# .PHONY: lint-zpretty
-# lint-zpretty: ${ZPRETTY_SENTINEL}   ## lint code-style zpretty (to XML/ZCML files)
-# 	@echo "$(OK_COLOR)Apply style zpretty rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
-# 	@find ${ADDONFOLDER} -name '*.zcml' -exec ${PYBIN}zpretty --check -z {} +
-# 	@find ${ADDONFOLDER} -name '*.xml'|grep -v locales|xargs zpretty --check -x
+.PHONY: lint-zpretty
+lint-zpretty: ${ZPRETTY_SENTINEL}   ## lint code-style zpretty (to XML/ZCML files)
+	@echo "$(OK_COLOR)Apply style zpretty rules to code in ${ADDONFOLDER}/*$(NO_COLOR)"
+	@find ${ADDONFOLDER} -name '*.zcml' -exec ${PYBIN}zpretty --check -z {} +
+	@find ${ADDONFOLDER} -name '*.xml'|grep -v locales|xargs zpretty --check -x
 
 .PHONY: lint ## lint all: check if complies with code-styles black, isort and zpretty
-lint: lint-black lint-isort
+lint: lint-black lint-isort lint-zpretty
 {%- endif %}
 
 ##############################################################################
