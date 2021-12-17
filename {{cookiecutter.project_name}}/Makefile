@@ -15,10 +15,18 @@ MAKEFLAGS+=--no-builtin-rules
 
 # Colors
 # OK=Green, warn=yellow, error=red
-OK_COLOR=`tput setaf 2`
-WARN_COLOR=`tput setaf 3`
-ERROR_COLOR=`tput setaf 1`
-NO_COLOR=`tput sgr0`
+ifeq ($(TERM),)
+# no colors if not in terminal
+	OK_COLOR=
+	WARN_COLOR=
+	ERROR_COLOR=
+	NO_COLOR=
+else
+	OK_COLOR=`tput setaf 2`
+	WARN_COLOR=`tput setaf 3`
+	ERROR_COLOR=`tput setaf 1`
+	NO_COLOR=`tput sgr0`
+endif
 
 ##############################################################################
 # SETTINGS AND VARIABLE
