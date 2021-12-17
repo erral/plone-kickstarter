@@ -217,7 +217,7 @@ ${ISORT_SENTINEL}: ${PIP_SENTINEL}
 ZPRETTY_SENTINEL=${SENTINELFOLDER}pip-zpretty.sentinel
 ${ZPRETTY_SENTINEL}: ${PIP_SENTINEL}
 	@echo "$(OK_COLOR)Install zpretty$(NO_COLOR)"
-	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} zpretty>=2.2.0
+	@${PYBIN}pip install -c ${CONSTRAINTS_MXDEV} "zpretty>=2.2.0"
 	@touch ${ZPRETTY_SENTINEL}
 
 .PHONY: apply-style-black
