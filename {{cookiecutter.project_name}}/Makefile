@@ -80,7 +80,7 @@ help: ## This help message
 	@echo
 	@echo "${WARN_COLOR}Additional parameters:${NO_COLOR}"
 	@echo "${MARK_COLOR}PYTHON${NO_COLOR}:       python interpreter to be used (default: python3)"
-	@echo "${MARK_COLOR}VENV${NO_COLOR}:        [on|off] wether to create a Python virtual environment or not (default: on)"s
+	@echo "${MARK_COLOR}VENV${NO_COLOR}:        [on|off] wether to create a Python virtual environment or not (default: on)"
 	@echo "${MARK_COLOR}VENV_FOLDER${NO_COLOR}: location of the virtual environment (default: ./venv)"
 	@echo
 	@echo "${WARN_COLOR}Targets:${NO_COLOR}"
