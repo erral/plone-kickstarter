@@ -1,5 +1,6 @@
 {
     "project_name": "acme.foo",
+    "project_directory": "acme.foo",
     "mode": ["standalone", "addon"],
     "requirements_out": "requirements-mxdev.txt",
     "admin_user": "admin",
