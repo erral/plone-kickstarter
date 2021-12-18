@@ -17,11 +17,13 @@ MAKEFLAGS+=--no-builtin-rules
 # OK=Green, warn=yellow, error=red
 ifeq ($(TERM),)
 # no colors if not in terminal
+	MARK_COLOR=
 	OK_COLOR=
 	WARN_COLOR=
 	ERROR_COLOR=
 	NO_COLOR=
 else
+	MARK_COLOR=`tput setaf 6`
 	OK_COLOR=`tput setaf 2`
 	WARN_COLOR=`tput setaf 3`
 	ERROR_COLOR=`tput setaf 1`
@@ -73,6 +75,15 @@ all: {%- if cookiecutter.mode == "addon" %}style test {%- endif %}run
 # And add help text after each target name starting with '\#\#'
 .PHONY: help
 help: ## This help message
+help: ## This help message
+	@echo "${OK_COLOR}This is the Makefile for ${WARN_COLOR}${PROJECT_NAME}${NO_COLOR}"
+	@echo
+	@echo "${WARN_COLOR}Additional parameters:${NO_COLOR}"
+	@echo "${MARK_COLOR}PYTHON${NO_COLOR}:       python interpreter to be used (default: python3)"
+	@echo "${MARK_COLOR}VENV${NO_COLOR}:        [on|off] wether to create a Python virtual environment or not (default: on)"s
+	@echo "${MARK_COLOR}VENV_FOLDER${NO_COLOR}: location of the virtual environment (default: ./venv)"
+	@echo
+	@echo "${WARN_COLOR}Targets:${NO_COLOR}"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 ##############################################################################
@@ -98,7 +109,7 @@ ${SENTINEL}:
 
 # PYTHON, VENV, PIP
 # venv and pybin
-PYTHON=python3
+PYTHON?=python3
 VENV?=on
 ifeq ("${VENV}", "on")
 	VENV_FOLDER?=./venv

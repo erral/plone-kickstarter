@@ -42,6 +42,8 @@ If one of the input file is changed, steps needed to take those changes into eff
 
 ## Python
 
+By default the command `python3` is used. By calling i.e. `make PYTHON=python3.9.8 run` this can be changed.
+
 The Makefile support different modes of Python:
 
 1. Create new virtualenv under `./venv` (default) from a global Python 3. `python3` is expected to be in the PATH.
@@ -51,6 +53,7 @@ The Makefile support different modes of Python:
 4. Like (3), but the environment is not activated, so we need to point *make* to the location with `make VENV=off VENV_FOLDER=~/myenv/myproject_venv` or alike.
 
 **Attention:** if those paramters are used, they *must* be passed to every make call!
+Setting them as environment variables like `export VENV=off` works too.
 
 **Hint:** Edit the `Makefile` and look for `VENV?=on` (which sets the default). And `VENV_FOLDER?=` (look for the if before) and adjust to your needs.
 
@@ -74,6 +77,9 @@ They aim to ease development and deployment of *Plone 6+*
 `sources.ini`
     *mxdev* is used to develop with sources from VCS like Git.
     If you need sources from git, add them here.
+
+`Dockerfile`
+    Minimal configuration to build an Docker image using *make* based on the official `plone-backend <https://github.com/plone/plone-backend>`_ image.
 
 ## Tools
 
