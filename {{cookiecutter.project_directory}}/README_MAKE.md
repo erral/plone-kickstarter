@@ -4,7 +4,7 @@ How to use this pip, mxdev, cookiecutter-zope-instance and make based install.
 
 ## Usage
 
-On the commandline, execute the ``make`` command.
+On the command-line, execute the ``make`` command.
 Without any options, make will run all steps.
 
 ```bash
@@ -36,8 +36,8 @@ clean       remove instance configuration (keeps data)
 Order for ``make run`` is: *prepare*, *install*, *instance*, *run*.
 
 The Makefile is built to detect changes.
-At the first ``make run`` all steps are excuted.
-Subsequent calls are only starting the applicaton server in the *run* step.
+At the first ``make run`` all steps are executed.
+Subsequent calls are only starting the application server in the *run* step.
 If one of the input file is changed, steps needed to take those changes into effect are executed again.\
 
 ## Python
@@ -49,10 +49,10 @@ The Makefile support different modes of Python:
 1. Create new virtualenv under `./venv` (default) from a global Python 3. `python3` is expected to be in the PATH.
 2. Like (1), but the `VENV_FOLDER` is passed to every *make* call: `make VENV_FOLDER=./some_folder/ install`.
 3. `make VENV=off install`: Direct usage of current configure Python 3 environment.
-   Like if one uses *pyenv* or another already activated virtual environment, or in CI if the environment is alredy isolated.
+   Like if one uses *pyenv* or another already activated virtual environment, or in CI if the environment is already isolated.
 4. Like (3), but the environment is not activated, so we need to point *make* to the location with `make VENV=off VENV_FOLDER=~/myenv/myproject_venv` or alike.
 
-**Attention:** if those paramters are used, they *must* be passed to every make call!
+**Attention:** if those parameters are used, they *must* be passed to every make call!
 Setting them as environment variables like `export VENV=off` works too.
 
 **Hint:** Edit the `Makefile` and look for `VENV?=on` (which sets the default). And `VENV_FOLDER?=` (look for the if before) and adjust to your needs.
