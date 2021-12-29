@@ -31,7 +31,7 @@ This cookiecutter templates result helps in
 `mode`
     - `standalone` (default): generate a build system for a Plone site,
       but folder does not directly contain a source package (like generated with *plonecli*).
-    - `add-on`: generate a integrated build for an add-on.
+    - `addon`: generate a integrated build for an add-on.
 
 `requirements-out`
     *mxdev* is used to help with development with sources on top f stable constraints.
@@ -62,7 +62,7 @@ These options can be stored in a `plone-kickstarter.yaml`:
 ```YML
     default_context:
         project_name: 'admin'
-        mode: 'add-on'
+        mode: 'addon'
         admin_user: 'admin
 ```
 
