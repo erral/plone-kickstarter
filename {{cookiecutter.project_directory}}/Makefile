@@ -324,7 +324,7 @@ clean:  clean-venv clean-pyc clean-make clean-instance   ## clean all (except lo
 ##############################################################################
 # DOCKER/CONTAINER
 
-# this needs a Dockerfile, which is not provided by plone-kickstarter
+# this needs a Dockerfile, which is provided by plone-kickstarter
 .PHONY: build-image
 build-image:  ## Build Docker Image
 ifneq ("$(wildcard Dockerfile)", "")
