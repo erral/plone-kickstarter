@@ -47,7 +47,8 @@ PIP_REQUIREMENTS_IN_FILE=requirements.txt
 {%- endif %}
 INSTANCE_YAML=instance.yaml
 INSTANCE_FOLDER=instance
-
+# if you want to install packages from a different pypi-compatible repository
+# add --find-links=http://pypi.example.com/simple/ to PIP_PARAMS variable
 PIP_PARAMS= --pre --use-deprecated legacy-resolver
 
 ##############################################################################
